@@ -1,5 +1,11 @@
 import sys
 from time import perf_counter
+import os
+import numpy as np
+import chess
+from ia_jogar import avaliar_posicao_simples, interpretar_avaliacao
+from dataset import fen_to_input
+from analisadordejogadas import load_eval_model
 
 def humano_vs_humano(xadrez):
     vez_brancas = True
@@ -7,7 +13,7 @@ def humano_vs_humano(xadrez):
     print('='*19)
     print("*PARTIDA INICIADA*")
     print('='*19)
-    xadrez.printarTabuleiro()
+    xadrez.printartabuleiro()
     print(" ")
     while True:
         cor_atual = 'brancas' if vez_brancas else 'pretas'
@@ -47,8 +53,22 @@ def humano_vs_humano(xadrez):
         if start_time is None:
             start_time = perf_counter()
 
-        xadrez.printarTabuleiro()
+        xadrez.printartabuleiroemoji()
         print(f"FEN: {fen_after}")
+        try:
+            model_path = os.path.join("Xadrez", "análises", "chess_eval_tf.keras")
+            if not os.path.exists(model_path):
+                model_path = os.path.join("tratamento de dados", "análises", "chess_eval_tf.keras")
+            modelo = load_eval_model(model_path)
+
+            avaliacao = avaliar_posicao_simples(modelo, fen_after)
+            print(f"Avaliação: {avaliacao:+.2f} -->", end=" ")
+            print("")
+            interpretar_avaliacao(avaliacao)
+        except Exception as e:
+            print(f"Erro na avaliação: {e}")
+        print(" ")
+
         try:
             fim, vencedor = xadrez.verificarFimDeJogo()
             if fim is not None:

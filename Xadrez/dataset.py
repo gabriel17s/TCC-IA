@@ -7,7 +7,7 @@ IDX = {c: i for i, c in enumerate(PIECES)}
 def fen_to_planes(fen: str):
     parts = fen.strip().split()
     board, turn, castling, ep = parts[0], parts[1], parts[2], parts[3]
-    planes = np.zeros((8, 8, 13), dtype=np.float32)  # 13 canais agora
+    planes = np.zeros((8, 8, 13), dtype=np.float32)
     
     r = 0
     for row in board.split('/'):

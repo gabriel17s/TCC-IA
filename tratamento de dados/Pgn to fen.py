@@ -28,16 +28,15 @@ import chess.pgn
 import os
 import sys
 
-in_path = r"C:\Users\gabri\OneDrive\Documentos\TCC\PGN2\Spielmann.PGN"
-out_dir = os.path.join("xadrez", "partidas")
+in_path = r"C:\Users\gabri\OneDrive\Documentos\TCC\tratamento de dados\PGN2\Magnus.PGN"
+out_dir = os.path.join("tratamento de dados", "partidas")
 os.makedirs(out_dir, exist_ok=True)
-out_path = os.path.join(out_dir, "partidas_spielmann.txt")
+out_path = os.path.join(out_dir, "partidas_magnus.txt")
 
 if not os.path.exists(in_path):
     print(f"Arquivo não encontrado: {in_path}", file=sys.stderr)
     sys.exit(1)
 
-# Abra com encoding e erros substituídos para evitar crash por caracteres estranhos
 with open(in_path, "r", encoding="utf-8", errors="replace") as fin, \
      open(out_path, "w", encoding="utf-8") as out:
 
@@ -55,7 +54,6 @@ with open(in_path, "r", encoding="utf-8", errors="replace") as fin, \
             board.push(mv)
             out.write(board.fen() + "\n")
 
-        # garante uma linha em branco entre partidas
         out.write("\n")
 
 print(f"Concluído: {jogos} partidas processadas -> {out_path}")

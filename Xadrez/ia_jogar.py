@@ -31,7 +31,7 @@ def jogar_contra_ia(xadrez, cor_jogador='brancas', profundidade=5):
     print("*PARTIDA INICIADA*")
     print('='*19)
 
-    xadrez.printarTabuleiro()
+    xadrez.printartabuleiroemoji()
     print("")
 
     vez_brancas = True
@@ -77,16 +77,27 @@ def jogar_contra_ia(xadrez, cor_jogador='brancas', profundidade=5):
             if start_time is None:
                 start_time = perf_counter()
 
-            xadrez.printarTabuleiro()
-            print(f"FEN: {fen_after}\n")
+            xadrez.printartabuleiroemoji()
+            print(f"FEN: {fen_after}")
+            try:
+                model_path = os.path.join(current_dir, "análises", "chess_eval_tf.keras")
+                if not os.path.exists(model_path):
+                    model_path = os.path.join("tratamento de dados", "análises", "chess_eval_tf.keras")
+                modelo_ia = load_eval_model(model_path)
+
+                avaliacao = avaliar_posicao_simples(modelo_ia, fen_after)
+                print(f"Avaliação: {avaliacao:+.2f} -->", end=" ")
+                interpretar_avaliacao(avaliacao)
+            except Exception as e:
+                print(f"Erro na avaliação: {e}")
+            print("")
 
         else:
-            print("IA está analisando a posição...", end=" ")
-            
+            print("\nIA está analisando a posição...", end=" ")
+
             fen_atual = xadrez.matriz_para_fen(xadrez.tabAtual)
-            
             board_chess = chess.Board(fen_atual)
-            
+
             try:
                 melhor_lance, avaliacao = find_best_move(
                     modelo_ia, 
@@ -108,32 +119,35 @@ def jogar_contra_ia(xadrez, cor_jogador='brancas', profundidade=5):
 
             origem_ia = melhor_lance.uci()[:2].upper()
             destino_ia = melhor_lance.uci()[2:4].upper()
-            
+
             print(f"IA escolheu: {origem_ia}{destino_ia}")
-            
+
             if board_chess.turn == chess.WHITE:
                 avaliacao_final = avaliacao
             else:
                 avaliacao_final = -avaliacao if avaliacao is not None else 0
-                
-            if avaliacao_final is not None:
-                print(f"Avaliação: {avaliacao_final/100:+.2f} -->", end=" ")
-                interpretar_avaliacao(avaliacao_final/100)
-            
+
             try:
                 xadrez.moverPedra(origem_ia, destino_ia)
 
                 if start_time is None:
                     start_time = perf_counter()
 
-                print(" ")
-                xadrez.printarTabuleiro()
+                xadrez.printartabuleiroemoji()
                 fen_apos_ia = xadrez.matriz_para_fen(xadrez.tabAtual)
-                print(f"FEN: {fen_apos_ia}\n")
+                print(f"FEN: {fen_apos_ia}")
+
+                if avaliacao_final is not None:
+                    print(f"Avaliação: {avaliacao_final/100:+.2f} -->", end=" ")
+                    interpretar_avaliacao(avaliacao_final/100)
+
             except Exception as e:
                 print(f"Erro ao executar lance da IA: {e}")
                 if not executar_fallback(xadrez, cor_atual):
                     break
+
+            print("")
+
 
         try:
             fim, vencedor = xadrez.verificarFimDeJogo()
@@ -234,7 +248,7 @@ def executar_fallback(xadrez, cor):
             try:
                 xadrez.moverPedra(origem_str, destino_str)
                 print(f"Movimento de fallback executado: {origem_str}{destino_str}")
-                xadrez.printarTabuleiro()
+                xadrez.printartabuleiroemoji()
                 return True
             except Exception as e:
                 print(f"Erro ao executar fallback: {e}")

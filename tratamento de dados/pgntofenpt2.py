@@ -8,7 +8,6 @@ import chess.pgn
 INPUT_PATH = "PGN2/lichess.pgn"
 OUTPUT_PATH = "partidas/lichess.txt"
 
-# garante pasta de saída
 os.makedirs(os.path.dirname(OUTPUT_PATH) or ".", exist_ok=True)
 
 def read_text_file(path):
@@ -40,7 +39,6 @@ any_game = False
 games_count = 0
 fens_count = 0
 
-# tenta interpretar como PGN múltiplo
 while True:
     try:
         game = chess.pgn.read_game(pgn_io)
@@ -51,15 +49,12 @@ while True:
     any_game = True
     games_count += 1
     board = game.board()
-    # para cada jogada salva FEN após aplicar a jogada
     for mv in game.mainline_moves():
         board.push(mv)
         fens_output.append(board.fen())
         fens_count += 1
-    # separador entre partidas: linha em branco
     fens_output.append("")
 
-# se o arquivo não era PGN, tenta extrair FENs já presentes no arquivo
 if not any_game:
     current_group_has_lines = False
     for raw in text.splitlines():
@@ -76,11 +71,9 @@ if not any_game:
         else:
             continue
 
-# remove separador final se existir
 if fens_output and fens_output[-1] == "":
     fens_output = fens_output[:-1]
 
-# grava só FENs e os separadores (linha em branco entre partidas)
 with open(OUTPUT_PATH, "w", encoding="utf-8") as out:
     out.write("\n".join(fens_output))
 

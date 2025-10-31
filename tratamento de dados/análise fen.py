@@ -2,14 +2,14 @@ import chess
 import chess.engine
 from pathlib import Path
 
-pasta_fen = Path("Xadrez/partidas")
-pasta_saida = Path("Xadrez/análises")
+pasta_fen = Path("tratamento de dados/partidas")
+pasta_saida = Path("tratamento de dados/análises")
 pasta_saida.mkdir(parents=True, exist_ok=True)
 
 caminho_stockfish = "C:/Users/gabri/OneDrive/Documentos/stockfish/stockfish-windows-x86-64-avx2.exe"
 
-arquivo_fen = pasta_fen / "lichess.txt"
-arquivo_saida = pasta_saida / "analise_lichess.txt"
+arquivo_fen = pasta_fen / "partidas_magnus.txt"
+arquivo_saida = pasta_saida / "analise_magnus.txt"
 
 engine = chess.engine.SimpleEngine.popen_uci(caminho_stockfish)
 

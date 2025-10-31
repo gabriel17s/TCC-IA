@@ -9,8 +9,16 @@ from tensorflow.keras import layers
 from dataset import load_dataset, fen_to_input
 
 BASE_DIR = os.path.dirname(__file__)
-DATA_DIR = os.path.join(BASE_DIR, "análises")
+DATA_DIR = os.path.abspath(os.path.join(BASE_DIR, "..", "tratamento de dados", "análises"))
 arquivos = glob.glob(os.path.join(DATA_DIR, "*.txt"))
+
+print("DATA_DIR:", DATA_DIR)
+print("Arquivos .txt encontrados:", len(arquivos))
+for a in arquivos:
+    print(" -", a)
+
+if not arquivos:
+    raise FileNotFoundError(f"Nenhum .txt em {DATA_DIR!r} — confere se a pasta existe e se o nome/acentos estão corretos.")
 
 X_planes_list, X_extras_list, y_list = [], [], []
 for path in arquivos:
@@ -60,12 +68,10 @@ x = layers.ReLU()(x)
 
 x = layers.GlobalAveragePooling2D()(x)
 
-# Processamento dos extras
 inp_extra = keras.Input(shape=(5,), name='extras')
 e = layers.Dense(32, activation='relu')(inp_extra)
 e = layers.Dense(16, activation='relu')(e)
 
-# Combinação
 h = layers.Concatenate()([x, e])
 h = layers.Dense(256, activation='relu')(h)
 h = layers.Dropout(0.3)(h)
@@ -89,7 +95,6 @@ callbacks = [
                                    save_best_only=True)
 ]
 
-# Treino
 history = model.fit(
     (Xtr_planes, Xtr_extras), ytr,
     validation_data=((Xva_planes, Xva_extras), yva),
@@ -101,7 +106,7 @@ history = model.fit(
 
 model.save(os.path.join(DATA_DIR, "chess_eval_tf.keras"))
 
-fen = "rnbqkb1r/p1pppp1p/5n2/1p4pQ/4P3/1P6/PBPP1PPP/RN2KBNR b - - 0 1"
+fen = "r3r1k1/pp3pp1/2n2q1p/7Q/3pB3/P7/1PP2PPP/R3R1K1 b - - 3 17"
 X_planes, X_extras = fen_to_input(fen)
 X_planes = X_planes[None, ...]
 X_extras = X_extras[None, ...]

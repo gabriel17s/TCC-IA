@@ -1,13 +1,10 @@
 class Regras:
-    # utilitárias
     def _to_coords(self, pos):
-        """Normaliza pos para (row,col). Aceita (r,c) ou 'A1'."""
         if isinstance(pos, tuple):
             return pos
         if isinstance(pos, list):
             return tuple(pos)
         if isinstance(pos, str):
-            # aceita formatos como "A1" ou "a1"
             try:
                 return self.algebraica_para_coords(pos)
             except Exception:
@@ -15,12 +12,10 @@ class Regras:
         return None
 
     def _posicao_moveu(self, pos):
-        """Retorna True se alguma jogada teve origem na pos (pos é (x,y) ou 'A1')."""
         pos_coords = self._to_coords(pos)
         if pos_coords is None:
             return False
         for jog in getattr(self, "jogadas", []):
-            # Jogada esperada: (origem, destino) onde cada um pode ser tuple ou string
             origem = jog[0] if len(jog) > 0 else None
             origem_coords = self._to_coords(origem)
             if origem_coords == pos_coords:
@@ -122,10 +117,7 @@ class Regras:
         return lances_possiveis
 
     def pode_fazer_roque(self, cor):
-        """
-        Retorna: 'roque pequeno', 'roque grande', 'roque ambos' ou False.
-        Não usa flags externas; usa self.jogadas e posição atual para decidir.
-        """
+
         if self.emXeque(cor):
             return False
 
@@ -144,34 +136,28 @@ class Regras:
             rei_char = 'r'
             torre_char = 't'
 
-        # Rei precisa estar na casa inicial
         if self.tabAtual[rei_pos[0]][rei_pos[1]] != rei_char:
             return False
 
-        # Presença das torres nas casas iniciais
         torre_esq_presente = (self.tabAtual[torre_esq_pos[0]][torre_esq_pos[1]] == torre_char)
         torre_dir_presente = (self.tabAtual[torre_dir_pos[0]][torre_dir_pos[1]] == torre_char)
 
-        # se rei já saiu da casa inicial em alguma jogada -> não pode rocar
         if self._posicao_moveu(rei_pos):
             return False
 
         pode_pequeno = False
         pode_grande = False
 
-        # calcular ataques adversários
         lances_adversarios = self.buscarTodosLances(cor=adversaria)
         casas_proibidas = {lance[1] for lance in lances_adversarios}
 
         row = rei_pos[0]
 
-        # roque grande (lado da coluna a)
         if torre_esq_presente and not self._posicao_moveu(torre_esq_pos):
             if (self.tabAtual[row][1] == '.' and self.tabAtual[row][2] == '.' and self.tabAtual[row][3] == '.'):
                 if (rei_pos not in casas_proibidas) and ((row,2) not in casas_proibidas) and ((row,3) not in casas_proibidas):
                     pode_grande = True
 
-        # roque pequeno (lado da coluna h)
         if torre_dir_presente and not self._posicao_moveu(torre_dir_pos):
             if (self.tabAtual[row][5] == '.' and self.tabAtual[row][6] == '.'):
                 if (rei_pos not in casas_proibidas) and ((row,5) not in casas_proibidas) and ((row,6) not in casas_proibidas):
@@ -309,7 +295,6 @@ class Regras:
             print("Lance inválido: Não é a vez dessa cor")
             return
 
-        # roque
         if (destino_x, destino_y) == (origem_x, origem_y + 2) or (destino_x, destino_y) == (origem_x, origem_y - 2):
             resultado_roque = self.pode_fazer_roque(self.turno)
             if resultado_roque:
@@ -335,20 +320,16 @@ class Regras:
                 print("Roque inválido!")
                 return
 
-        # validação
         if self.validarLance(pedra, origem, destino) is None:
             print("Lance inválido: Movimento não permitido para essa peça")
             return
 
-        # en passant
         if pedra.upper() == 'P' and origem_y != destino_y and self.tabAtual[destino_x][destino_y] == '.':
             self.tabAtual[origem_x][destino_y] = "."
 
-        # movimento normal
         self.tabAtual[destino_x][destino_y] = pedra
         self.tabAtual[origem_x][origem_y] = "."
 
-        # promoção
         if pedra == 'P' and destino_x == 0:
             escolha = input("Promover para (D=Torre, T=Torre, B=Bispo, C=Cavalo): ").upper()
             if escolha in ['D', 'T', 'B', 'C']:
