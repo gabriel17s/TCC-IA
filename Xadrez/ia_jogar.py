@@ -93,7 +93,7 @@ def jogar_contra_ia(xadrez, cor_jogador='brancas', profundidade=5):
             print("")
 
         else:
-            print("\nIA está analisando a posição...", end=" ")
+            print("\nA IA está pensando...", end=" ")
 
             fen_atual = xadrez.matriz_para_fen(xadrez.tabAtual)
             board_chess = chess.Board(fen_atual)

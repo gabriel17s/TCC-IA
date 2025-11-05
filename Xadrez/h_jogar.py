@@ -63,7 +63,7 @@ def humano_vs_humano(xadrez):
 
             avaliacao = avaliar_posicao_simples(modelo, fen_after)
             print(f"Avaliação: {avaliacao:+.2f} -->", end=" ")
-            print("")
+            #print("")
             interpretar_avaliacao(avaliacao)
         except Exception as e:
             print(f"Erro na avaliação: {e}")

@@ -33,6 +33,24 @@ def board_to_fen(lines):
 
     return f"{placement} b - - 0 1"
 
+tab = [
+    ["t","c","b","d","r","b","c","t"],
+    ["p","p","p","p","p","p","p","p"],
+    [".",".",".",".",".",".",".","."],
+    [".",".",".",".",".",".",".","."],
+    [".",".",".",".",".",".",".","."],
+    [".",".",".",".",".",".",".","."],
+    ["P","P","P","P","P","P","P","P"],
+    ["T","C","B","D","R","B","C","T"]
+]
+
+print("Tabuleiro inicial: \n")
+print("A B C D E F G H |")
+print("------------------")
+for i, linha in enumerate(tab):
+    print(" ".join(linha), "|", 8 - i)
+print("\n")
+
 def main():
     print("Cole/Digite 8 linhas do tabuleiro (use '.' para vazio).")
     lines = []
